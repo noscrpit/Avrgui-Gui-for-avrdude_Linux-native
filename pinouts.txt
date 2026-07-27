@@ -1,0 +1,42 @@
+=== atmega328p ===
+          ATmega328P (DIP-28)
+             +---\/---+
+[RESET]--| 1    28 |--SCL
+       [RX]--| 2    27 |--SDA
+       [TX]--| 3    26 |--PC3
+      INT0--| 4    25 |--PC2
+      INT1--| 5    24 |--PC1
+       PD5--| 6    23 |--PC0
+   [VCC] --| 7    22 |-- [GND]
+   [GND] --| 8    21 |--AREF
+    XTAL1--| 9    20 |--[AVCC]
+    XTAL2--| 10   19 |--[SCK]
+        PD7--| 11   18 |--[MISO]
+        PB0--| 12   17 |--[MOSI]
+        PB2--| 14   15 |--PB1
+             +--------+
+👉 POŁĄCZENIA ISP: VCC(7), GND(22), MOSI(17), MISO(18), SCK(19), RESET(1)
+===
+=== attiny85 ===
+           ATtiny85 (DIP-8)
+             +---\/--+
+    [RESET]--| 1   8 |-- [VCC]
+        PB3--| 2   7 |-- [SCK]
+        PB4--| 3   6 |-- [MISO]
+     [GND] --| 4   5 |-- [MOSI]
+             +-------+
+👉 POŁĄCZENIA ISP: VCC(8), GND(4), MOSI(5), MISO(6), SCK(7), RESET(1)
+===
+=== attiny1614 ===
+          ATtiny1614 (SOIC-14)
+             +---\/---+
+    [VDD] --| 1    14 |-- [GND]
+       PA4--| 2    13 |--PA3
+       PA5--| 3    12 |--PA2
+       PA6--| 4    11 |--PA1
+       PA7--| 5    10 |-- [UPDI / RESET]
+       PB3--| 6     9 |--PB0
+       PB2--| 7     8 |--PB1
+             +--------+
+👉 POŁĄCZENIA UPDI: VDD(1), GND(14), UPDI(10)
+===
