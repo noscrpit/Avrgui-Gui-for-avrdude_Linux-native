@@ -9,6 +9,7 @@ no_file_hex = No .hex file selected
 no_file_eep = No .hex/.eep file selected
 err_no_file = Error: Select a file to write first!
 cancel = 🛑 CANCEL OPERATION
+eg.. -B 8 or -F (write if You want) = eg.. -B 8 or -F (write if You want)
 detect_prog = 🔍 Autodetect Programmer
 detect_mcu = 🧬 Detect MCU
 chip_erase = 🧹 Chip Erase
