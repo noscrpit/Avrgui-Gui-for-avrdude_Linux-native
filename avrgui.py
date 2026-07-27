@@ -20,7 +20,7 @@ PINOUTS_FILE = "pinouts.txt"
 LANG_DIR = "lang"
 
 TXT = {
-    "title": "Natywny GUI avrdude Linux v1.0-RC - Wersja Profesjonalna",
+    "title": "Natywny GUI dla avrdude Linux v1.0-RC",
     "flash_box": "Pamięć FLASH",
     "eeprom_box": "Pamięć EEPROM",
     "browse": "Przeglądaj...",
