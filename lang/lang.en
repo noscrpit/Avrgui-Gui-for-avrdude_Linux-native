@@ -8,14 +8,14 @@ read = Read (Backup)
 no_file_hex = No .hex file selected
 no_file_eep = No .hex/.eep file selected
 err_no_file = Error: Select a file to write first!
-cancel = 🛑 CANCEL OPERATION
-eg.. -B 8 or -F (write if You want) = eg.. -B 8 or -F (write if You want)
-detect_prog = 🔍 Autodetect Programmer
+cancel = 🛑 STOP!
+eg.. -b 8 or -f (write if you want) = e.g. -B 8 or -F (only if you really need it)
+detect_prog = 🔍 Detect Programmer (Autodetect)
 detect_mcu = 🧬 Detect MCU
 chip_erase = 🧹 Chip Erase
 mem_tab = Memory (Flash/EEPROM)
 pinout_tab = Pinout Viewer
-fuses_tab = Fuses & Locks
+fuses_tab = Fuses/Locks
 console_title = AVRDUDE Logs and Operations Output:
 hw_config = Hardware Configuration
 control_auto = Control & Automation:
@@ -36,3 +36,37 @@ bod_disabled = Disabled (BOD disabled)
 bod_27 = Enabled (2.7V)
 bod_43 = Enabled (4.3V)
 bod_18 = Enabled (1.8V)
+pinout_missing = No pinout image for chip: {mcu}
+	
+	Put an image file (PNG / JPG / SVG) named
+	{mcu}.png
+	into the directory:
+	{dir}
+esp_tab = ESP8266 (esptool)
+esp_fw_box = ESP Firmware (.bin)
+esp_backup_box = Flash Memory Backup
+esp_tools_box = esptool Tools
+esp_no_file = No .bin file selected
+esp_addr = Address:
+esp_size = Flash size:
+esp_detect = 🧬 Detect Chip (chip_id + flash_id)
+esp_erase = 🧹 Erase Flash (erase_flash)
+esp_baud = Baud rate:
+esp_hint = ESP-01S: 3.3 V supply (NOT 5 V!). Programming mode: GPIO0 connected to GND at power-up, CH_PD (EN) to 3.3 V. Select the port in the Port (-P) field above, e.g. /dev/ttyUSB0.
+ota_tab = ESP OTA (WiFi)
+ota_box = WiFi Upload (OTA)
+ota_host = Address (IP / name):
+ota_port = Port:
+ota_pass = OTA Password:
+ota_type = Type:
+ota_type_fw = Firmware (flash)
+ota_type_fs = File system (SPIFFS/LittleFS)
+ota_upload = 📡 Upload over WiFi (OTA)
+ota_no_file = No .bin file selected
+ota_hint = OTA only works if the ESP already runs a program with ArduinoOTA support - flash it over a cable the first time (ESP8266 tab). The .bin file is a compiled sketch (Arduino IDE: Sketch -> Export Compiled Binary). The computer and the ESP must be on the same network, and the computer's firewall must allow the incoming connection from the ESP.
+esp_console_title = esptool / OTA Logs:
+ota_scan = 🔍 Search
+esp_ports = 🔄 Ports
+clear_logs = 🧹 Clear logs
+fuse_read = Read
+
