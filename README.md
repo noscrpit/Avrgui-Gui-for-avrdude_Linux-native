@@ -1,113 +1,189 @@
-# Avrgui – Natywna nakładka na avrdude - Linux GUI v1.0
+# Native GUI for avrdude (Linux)
 
-## 📄 Licencja
+[English version → README.en.md](README.en.md)
 
-Projekt jest udostępniany w stanie "takim, jaki jest" na licencji
+Natywna, lekka nakładka graficzna (PyQt6) na **avrdude** do programowania mikrokontrolerów AVR,
+rozszerzona o obsługę **ESP8266** przez **esptool** oraz wgrywanie firmware **przez WiFi (OTA)**.
 
-**GNU General Public License v3.0 (GPLv3)**. 
+> **Status: `v1.0-RC`.** Część AVR jest podstawową funkcjonalnością programu. Zakładki **ESP8266**
+> i **ESP OTA** są **eksperymentalne** i wymagają potwierdzenia na prawdziwym sprzęcie.
 
-Używasz go na własną odpowiedzialność.
+## Spis treści
+- [Funkcje](#funkcje)
+- [Wymagania](#wymagania)
+- [Szybki start](#szybki-start)
+- [Obsługa](#obsługa)
+- [Struktura plików](#struktura-plików)
+- [Język interfejsu](#język-interfejsu)
+- [Uprawnienia (udev, dialout)](#uprawnienia-udev-dialout)
+- [Rozwiązywanie problemów](#rozwiązywanie-problemów)
+- [Ograniczenia](#ograniczenia)
+- [Współtworzenie](#współtworzenie)
+- [Licencja](#licencja)
 
+## Funkcje
 
-Starano się bardzo, aby program ten nic nie popsuł.
+**AVR (avrdude)**
+- Zapis i odczyt (kopia) pamięci **FLASH** i **EEPROM** (Intel HEX).
+- Odczyt i zapis **bezpieczników i lock bitów** z interaktywnym kalkulatorem
+  (zegar, watchdog, BOD, weryfikacja po zapisie).
+- Kasowanie układu (Chip Erase) oraz przycisk **ZATRZYMAJ** przerywający bieżącą operację.
+- **Autodetect programatora** po USB (USBasp, CH341A, serialupdi, Arduino/CH340) wraz z wpisaniem portu.
+- **Wykrywanie procesora** na podstawie sygnatury.
+- **Podgląd pinoutu jako obraz** z katalogu `pinouts/` (własne zdjęcia lub schematy).
+- Listy programatorów i procesorów pobierane z zainstalowanego avrdude.
+- Konsola z logami operacji i przycisk **Wyczyść logi**.
 
-Kod jest wolny, otwarty i chroniony przed zamknięciem w płatnych, komercyjnych rozwiązaniach – idea wolnego oprogramowania i systemu Linux jest tu w pełni kontynuowana!
+**ESP8266 (esptool)** *(eksperymentalne)*
+- Wykrycie układu (`chip_id`, `flash_id`) i kasowanie flasha.
+- Zapis pliku `.bin` pod wybrany adres oraz odczyt kopii flasha (512 KB – 4 MB).
+- Wybór prędkości transmisji i odświeżanie listy portów.
+- Osobna konsola logów esptool.
 
-Lekki, asynchroniczny i w 100% natywny interfejs graficzny (GUI) dla narzędzia **AVRDUDE**, napisany w języku Python 3 z wykorzystaniem nowoczesnej biblioteki PyQt6.
+**ESP OTA (WiFi)** *(eksperymentalne)*
+- Wgrywanie **firmware** lub **systemu plików** (SPIFFS/LittleFS) protokołem **ArduinoOTA**,
+  zaimplementowanym natywnie w Pythonie (bez `espota.py`).
+- Obsługa hasła OTA, postęp w konsoli, możliwość anulowania.
+- **Wyszukiwanie urządzeń w sieci** przez mDNS.
 
-Jest  kompletny i zoptymalizowany  pod systemy Linux:
+## Wymagania
 
-– działa błyskawicznie, 
+| Składnik | Wymagany | Uwagi |
+|---|---|---|
+| Python 3.9+ | tak | |
+| PyQt6 | tak | interfejs graficzny |
+| avrdude | tak | programowanie AVR |
+| usbutils (`lsusb`) | zalecany | autodetect programatora |
+| esptool | opcjonalnie | tylko zakładka ESP8266 |
 
--nie wymaga ociężałego środowiska *Mono*
+Debian / Ubuntu:
 
-*-* został zabezpieczony przed zamrażaniem okna podczas operacji sprzętowych.
-
-
-## 🚀 Kluczowe możliwości
-
-- **Asynchroniczne działanie (`QThread`)**: 
-
-- Wszystkie operacje AVRDUDE wykonują się w osobnym wątku. 
-
-- Okno programu nigdy się nie zawiesza i pozwala na płynne podglądanie logów w czasie rzeczywistym.
-
-
-- **Przycisk Przerwij (`Cancel`)**: 
-
-- Czerwony przycisk umożliwia natychmiastowe ubicie procesu komunikacji, jeśli sprzęt utknie z powodu braku zasilania lub odłączonego kabla.
-
-
-- **Automatyczne wykrywanie programatorów (Autodetect przy starcie)**: 
-
-- Program sam przeczesuje szynę USB za pomocą `lsusb` i automatycznie konfiguruje parametry oraz porty `/dev/ttyUSB\*` dla układów **USBasp**, **CH340** oraz **CH341A**.
-
-
-- **Wykrywanie procesora (`Detect MCU`)**: 
-
-- Niebieski przycisk wysyła zapytanie do programatora, odczytuje sygnaturę fabryczną podłączonego chipu (np. ATmega328P, ATtiny85) i sam automatycznie ustawia właściwy model na liście.
-
-- **Ochrona przed spamem błędów**: 
-
-- Dla programatorów seryjnych automatycznie wymusza tylko 1 próbę połączenia (`attempts=1`), zapobiegając czekaniu na timeout i sypaniu błędami.
-
-
-- **Pamięć i Bezpieczniki**: 
-
-- Obsługuje zapis/odczyt pamięci FLASH i EEPROM (wraz z weryfikacją `Verify` i funkcją `Chip Erase`) oraz pełną edycję i kalkulator bezpieczników (`lfuse`, `hfuse`, `efuse`, `lock`).
-
-- **Zapamiętywanie ustawień**: Program zapisuje konfigurację do pliku `gui\_config.txt`, dzięki czemu po restarcie pamięta ostatnio używane flagi i ścieżki plików.
-
-
-## 🛠️ Wymagania systemowe i instalacja
-
-Program do działania potrzebuje Pythona 3 oraz kilku narzędzi systemowych.
-
-- wymagane zależności :
-
-```
-python3 python3-pyqt6 avrdude usbutils
+```bash
+sudo apt install python3 python3-pyqt6 avrdude usbutils
+sudo apt install esptool            # opcjonalnie, dla ESP8266
 ```
 
-***Uwaga!:***
+Inne dystrybucje: zainstaluj odpowiedniki pakietów albo użyj środowiska wirtualnego
+(`python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt`).
 
-*Rekomendowana jest wersja **AVRDUDE 8.0 lub nowsza** dla pełnej kompatybilności z nowoczesnymi układami.*
+## Szybki start
 
-## 🏃 Uruchomienie programu
-
-1. Pobierz plik avr`gui.py` na swój komputer.
-
-2. Nadaj mu uprawnienia do wykonywania jako program (wystarczy raz):
-
-```
-chmod +x ./avr`gui.py`
+```bash
+git clone <adres-repozytorium>
+cd <katalog>
+python3 avrgui.py
 ```
 
-3. Uruchom program bezpośrednio z konsoli (lub klikaj na niego):
+Program nie wymaga instalacji. Uruchamiaj go **z jego katalogu** – plik konfiguracji
+i katalog `lang/` są zapisywane względem bieżącego katalogu roboczego.
+
+## Obsługa
+
+**Pasek konfiguracji (góra okna)**
+1. Kliknij **Wykryj programator** – program rozpozna sprzęt i wpisze programator oraz port.
+2. Kliknij **Wykryj proc**, aby odczytać sygnaturę układu, albo wybierz procesor ręcznie.
+3. W polu **Dodatkowe flagi** możesz wpisać własne opcje avrdude (np. `-B 8`, `-F`).
+
+**Pamięć (Flash/EEPROM)** – wybierz plik `.hex` i kliknij **Zapisz** albo użyj
+**Odczytaj (Kopia)**, aby zapisać zawartość układu do pliku.
+
+**Podgląd Pinów** – pokazuje obrazek z `pinouts/` dla wybranego procesora.
+Własne zdjęcie dodasz, kopiując plik do katalogu pod nazwą układu, np. `pinouts/atmega328p.png`.
+
+**Bezpieczniki (Fuses/Locks)** – **Odczytaj** pobiera wartości z układu, a **Zapisz** wysyła je do układu.
+Pola „N/A” oznaczają bezpiecznik, którego układ nie ma; są pomijane przy zapisie.
+
+> ⚠️ **Uwaga:** błędne ustawienie fuse'ów (np. zegara lub linii RESET) może zablokować układ.
+> Zanim klikniesz **Zapisz**, upewnij się, że rozumiesz skutki.
+
+**ESP8266 (esptool)** – wybierz port w polu **Port (-P)**, przełącz układ w tryb programowania
+(GPIO0 do GND przy starcie, CH_PD/EN do 3,3 V) i użyj **Wykryj układ**, **Kasuj flash**, **Zapisz**
+lub **Odczytaj (Kopia)**. Moduły ESP zasilaj z **3,3 V**.
+
+**ESP OTA (WiFi)** – wpisz adres IP (lub nazwę `.local`) albo kliknij **Szukaj**, wybierz plik `.bin`
+i kliknij **Wgraj przez WiFi (OTA)**.
+- W ESP musi już działać program z obsługą **ArduinoOTA** (pierwszy raz wgraj go kablem).
+- Plik `.bin` to skompilowany szkic (Arduino IDE: *Szkic → Eksportuj skompilowany plik binarny*).
+- Komputer i ESP muszą być w tej samej sieci, a zapora musi przepuszczać połączenie przychodzące od ESP
+  (ESP łączy się zwrotnie z komputerem na losowym porcie TCP).
+
+## Struktura plików
 
 ```
-./avr`gui.py`
+avrgui.py          główny program
+requirements.txt   zależności Pythona
+CHANGELOG.md       lista zmian
+LICENSE            GNU GPL v3
+lang/lang.en       gotowe tłumaczenie angielskie
+pinouts/           obrazy pinoutów układów (program tworzy katalog, jeśli go brak)
+udev/99-avr.rules  reguły udev dla programatorów USB
 ```
 
+Pliki tworzone w czasie pracy:
 
-📬 Przetestuj wersję v1.0-RC i daj znać jeśli chcesz!
+| Plik | Położenie | Opis |
+|---|---|---|
+| `pinouts/*.png` | obok `avrgui.py` | domyślne schematy ATmega328P i ATtiny85 (tylko gdy ich brak) |
+| `gui_config.txt` | katalog roboczy | zapamiętany plik FLASH i dodatkowe flagi |
+| `lang/lang.template` | katalog roboczy | szablon tłumaczeń (odtwarzany przy każdym starcie) |
 
+## Język interfejsu
 
-Jeśli przetestowałeś program na swoim komputerze, jeśli chcesz, napisz, do mnie na
+Domyślny język to polski. Gotowe tłumaczenie angielskie jest w `lang/lang.en` – program wczytuje je,
+gdy zmienna `LANG` nie jest polska:
 
-maila: noscrpit@gmail.com
+```bash
+LANG=en_US.UTF-8 python3 avrgui.py
+```
 
-- Jakiej dystrybucji Linuksa używasz i jak działa program?
+Własny język: skopiuj `lang/lang.template` (powstaje po pierwszym uruchomieniu) do `lang/lang.en`,
+przetłumacz wartości i zostaw klucze bez zmian. Brakujące klucze są uzupełniane tekstami polskimi.
 
-- Czy automatyczne wykrywanie poprawnie znalazło Twój programator i port?
+## Uprawnienia (udev, dialout)
 
-- Czy wyszukiwarka układów i podgląd pinów działają prawidłowo?
+**Porty szeregowe** (`/dev/ttyUSB*`, `/dev/ttyACM*`) – dodaj użytkownika do grupy `dialout`
+i zaloguj się ponownie:
 
-- Czy dokonałeś jakichś zmian – i jakich?
+```bash
+sudo usermod -aG dialout "$USER"
+```
 
+**Programatory USB** (USBasp, CH341A) – zainstaluj dołączone reguły udev
+i podłącz programator ponownie:
 
-Razem możemy udoskonalić program. 
+```bash
+sudo cp udev/99-avr.rules /etc/udev/rules.d/
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
 
+## Rozwiązywanie problemów
 
-Miłego i owocnego programowania scalaków! - noscrpit
+| Objaw | Co sprawdzić |
+|---|---|
+| Pole Port pokazuje „Brak” | Kabel; na zakładce ESP przycisk **🔄 Porty**; użytkownik w grupie `dialout`. |
+| avrdude używa `/dev/ttyS0` | Nie wybrano portu – kliknij **Wykryj programator** albo wybierz port ręcznie. |
+| „Detect MCU” wskazuje zły układ | Autodetect rozpoznaje programator po ID USB, nie układ. Wybierz procesor ręcznie. CH340 może być też adapterem ESP. |
+| `esptool not found` | `sudo apt install esptool` lub `pip install esptool`. |
+| OTA: „No response from the ESP” | Adres/WiFi, ArduinoOTA w szkicu, ta sama sieć. |
+| OTA: „did not connect back” | Zapora na komputerze blokuje połączenie przychodzące. |
+| „Szukaj” niczego nie znajduje | mDNS bywa blokowany przez router lub zaporę – wpisz adres IP ręcznie. |
+| Ostrzeżenie o wersji pliku konfiguracji | Komunikat avrdude (niezgodność `avrdude.conf` z wersją programu), zwykle nieszkodliwy. |
 
+## Ograniczenia
+
+- Kalkulator fuse'ów liczy wartości **tylko dla ATmega328P**. Dla innych układów używaj pól „Wartości bezpośrednie”.
+- Autodetekcja procesora zna ograniczoną listę sygnatur (m.in. ATmega328/328P/168/168P/88/8/2560/32U4,
+  ATtiny85/13/2313/1614).
+- Zapis fuse'ów nie wymaga dodatkowego potwierdzenia.
+- ESP8266 i OTA są eksperymentalne; OTA obsługuje wyłącznie urządzenia z ArduinoOTA.
+- Program jest przeznaczony dla Linuksa.
+
+## Współtworzenie
+
+Zgłoszenia błędów i propozycje zmian są mile widziane. Przy zgłoszeniu podaj wersję avrdude
+(`avrdude -?`), dystrybucję, używany programator oraz fragment logu z konsoli programu.
+
+## Licencja
+
+Projekt jest udostępniany na licencji **GNU General Public License v3.0 (GPLv3)** – pełny tekst w pliku
+[LICENSE](LICENSE). Autorami są wszyscy, którzy dołączą do projektu lub zmodyfikują go i udostępnią dalej.
